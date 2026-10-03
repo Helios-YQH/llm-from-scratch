@@ -1,0 +1,14 @@
+# The monorepo root ignores *.pdf and *.png globally to keep experiment
+# artefacts out of git. This report's compiled PDF and its vector figures are
+# part of the deliverable, so re-include them here. The PNGs next to the
+# figures are throwaway previews for eyeballing in an image viewer.
+!*.pdf
+figures/*.png
+
+# LaTeX build intermediates
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
