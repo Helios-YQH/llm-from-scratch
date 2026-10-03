@@ -1,0 +1,56 @@
+# IDE config (local settings, not tracked)
+.idea/
+.vscode/
+
+# Local agent notes
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+# PDFs as a class; report dirs re-include their own via a local .gitignore
+*.pdf
+
+# Local study notes (not tracked)
+experiment_*.md
+*实验记录*.md
+*_planning.md
+validator_quality.md
+
+# Experiment artifacts
+analysis_data/
+analysis_plots/
+
+# Images (reproducible; report dirs re-include their figures)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.webp
+*.ico
+
+# Python / uv environments and bytecode
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+__pycache__/
+*.py[cod]
+*.so
+.env
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
