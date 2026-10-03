@@ -18,7 +18,7 @@
 
 ## 报告
 
-五份报告同时以 PDF 形式挂在 [v1.0 release](https://github.com/heliosyqh-crypto/llm-from-scratch/releases/tag/v1.0)。
+五份报告同时以 PDF 形式挂在 [v1.0 release](https://github.com/Helios-YQH/llm-from-scratch/releases/tag/v1.0)。
 
 1. **A Transformer Language Model From Scratch: Implementation and Controlled Experiments** — [PDF](transformer-lm/report/tech_report.pdf)
 2. **Where the Time and Memory Go: Systems Optimizations for Transformer Training** — [PDF](training-systems/report/tech_report.pdf)
