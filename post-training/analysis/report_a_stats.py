@@ -98,6 +98,20 @@ for variant in ("grpo_constant", "dr_grpo", "rft", "maxrl"):
     line(variant, f"{vals[0]:.4f} / {vals[1]:.4f}")
 line("standard run (e4_lr1e-05_seed0)", f"{val('e4_lr1e-05_seed0')[-1]['val_accuracy']:.4f}")
 
+# The dispersion the paper quotes: how far the variants' two-seed means are
+# apart, against how far the two seeds of one variant are apart. Both are
+# computed from the same final-greedy values printed above.
+e6 = {v: [val(f"e6_{v}_seed{s}")[-1]["val_accuracy"] for s in (0, 1)]
+      for v in ("grpo_constant", "dr_grpo", "rft", "maxrl")}
+e6_means = {v: sum(x) / 2 for v, x in e6.items()}
+line("two-seed means span",
+     f"{max(e6_means.values()) - min(e6_means.values()):.4f} "
+     f"({min(e6_means.values()):.3f}..{max(e6_means.values()):.3f})")
+e6_gaps = [abs(x[0] - x[1]) for x in e6.values()]
+line("per-variant seed gaps", f"{min(e6_gaps):.4f}..{max(e6_gaps):.4f}")
+line("standard run vs dr_grpo", " / ".join(
+    f"{x - val('e4_lr1e-05_seed0')[-1]['val_accuracy']:+.4f}" for x in e6["dr_grpo"]))
+
 print()
 print("=" * 72)
 print("E7 off-policy corrections (80 steps, 2 seeds) -- final greedy")

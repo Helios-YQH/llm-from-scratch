@@ -48,18 +48,19 @@ We fine-tune an 8B base language model in two stages --- supervised instruction
 tuning on 228{,}743 examples, then direct preference optimization on 49{,}326
 human preference pairs --- and evaluate it on knowledge (MMLU), reasoning
 (GSM8K), open-ended quality (AlpacaEval) and safety (SimpleSafetyTests).
-Three results stand out. First, the apparent knowledge gain from instruction
+The apparent knowledge gain from instruction
 tuning (+7.0 points on MMLU) is mostly a change in \emph{answer format}: the base
 model fails to produce a parseable answer on 9.8\% of items under the
-instruction-tuned prompt template and the fine-tuned model fails on none, while
+instruction template the fine-tuned models were trained on, and the fine-tuned
+model fails on none, while
 its answers shrink from 353 to 27 characters. The same brevity costs 4.5 points
-on GSM8K, where the dropped text was the reasoning. Second, preference
+on GSM8K, where the dropped text was the reasoning. Preference
 optimization partly reverses this: it restores GSM8K above the base model at the
-cost of both MMLU and format compliance. Third, and most consequentially,
-\emph{the judge dominates the number}. The same model outputs scored by four
-judges of different capability yield AlpacaEval winrates spanning 3.8\% to 33.2\%;
-a locally served 8B judge rates every model 5--8$\times$ higher than three
-frontier APIs and exhibits 10--25$\times$ position bias against their
+cost of both MMLU and format compliance. Most consequentially,
+\emph{the judge dominates the number}. The same three models, scored by four
+judges of different capability, span 3.8--9.4\% under the three frontier APIs and
+26--33\% under a locally served 8B judge, which rates every model 3.5--8$\times$
+higher and exhibits 9.7--24.6$\times$ position bias against their
 1.0--1.8$\times$. The ordering of our three models survives across the three
 frontier judges and under the benchmark's own length-controlled metric, but not
 across a weak judge. We report the length-controlled winrate alongside the raw
@@ -71,7 +72,7 @@ one throughout.
 Post-training a base language model typically proceeds in two stages: supervised
 instruction tuning, which teaches the model to follow instructions and adopt an
 answer format, and preference optimization, which shifts the model toward answers
-annotators prefer. Both are standard, and the question worth asking about a
+annotators prefer. Both are standard, and the useful question about a
 particular pair of them is not whether they work but \emph{what they change} ---
 which capabilities move, in which direction, and how much of the measured
 movement is the model rather than the instrument.
@@ -82,7 +83,8 @@ apply LoRA supervised fine-tuning on 228{,}743 instructions, then LoRA DPO on
 49{,}326 human preference pairs, and evaluate the base, the fine-tuned and the
 preference-tuned models on four axes: MMLU \citep{hendrycks2021mmlu}, GSM8K
 \citep{cobbe2021gsm8k}, AlpacaEval \citep{li2023alpacaeval} and SimpleSafetyTests
-\citep{vidgen2024sst}.
+\citep{vidgen2024sst}. Code, data and the full experiment records, including the
+judge harness, are at \url{https://github.com/Helios-YQH/llm-from-scratch}.
 
 Our contributions are:
 
@@ -90,14 +92,14 @@ Our contributions are:
 \item A two-stage pipeline trained end to end under a fixed compute budget, with
       throughput, memory and loss records reported alongside the evaluation, so
       the cost of each result is legible.
-\item Evidence that the instruction-tuning MMLU gain at this scale is dominated
-      by format compliance rather than knowledge, and that the corresponding loss
+\item Evidence that the instruction-tuning MMLU gain at this scale is mostly
+      format compliance rather than knowledge, and that the corresponding loss
       on GSM8K comes from the same shortening.
 \item A judge study: the same 805 AlpacaEval predictions scored by four judges of
       different capability and family, which quantifies how much of a
-      judge-scored number is the judge. We find the absolute level is not robust
-      at all, position bias scales inversely with judge capability, and --- the
-      part that matters for practice --- the model \emph{ordering} survives
+      judge-scored number is the judge. The absolute level is not a property of
+      the model, position bias scales inversely with judge capability, and the
+      model \emph{ordering} survives
       across frontier judges but not across a weak one.
 \end{itemize}
 
@@ -107,7 +109,8 @@ Our contributions are:
 
 The base model is Llama-3.1-8B. Instruction tuning uses a 228{,}743-example
 single-turn mixture drawn from UltraChat-200K \citep{ding2023ultrachat} and the
-SafetyTunedLlamas preference set, packed into 512-token sequences (120M tokens in
+SafetyTunedLlamas instruction collection (\texttt{vinid/safety-tuned-llamas}),
+packed into 512-token sequences (120M tokens in
 the training split). Preference optimization uses Anthropic's HH preference data
 \citep{bai2022hh}: of 160{,}800 rows across the four released splits, dropping
 multi-turn conversations and rows whose two branches do not share a prompt leaves
@@ -120,15 +123,14 @@ alone, which does not fit the 48\,GB cards this work ran on. LoRA does not make
 the step cheaper --- the forward and backward still traverse every parameter ---
 it only makes the optimizer affordable.
 
-Everything ran on a single shared A6000 (48\,GB) with four other tenants.
+All runs used a single A6000 (48\,GB) shared with four other users.
 
 \subsection{Supervised fine-tuning}
 
 \begin{table}[t]
 \centering
 \caption{Supervised fine-tuning. Throughput is the median over the run; the run
-stopped at 68\% of one epoch because the loss had flattened, not because of a
-failure.}
+stopped at 68\% of one epoch: the loss had flattened.}
 \label{tab:sft}
 \small
 \begin{tabular}{ll}
@@ -146,10 +148,10 @@ held-out loss & prompt 2.347 $\rightarrow$ 1.776; response 1.063 $\rightarrow$ 0
 \end{tabular}
 \end{table}
 
-Table~\ref{tab:sft} and Figure~\ref{fig:sft} summarise the run. Two observations
-matter for what follows. The loss flattens well before the epoch ends --- the last
+Table~\ref{tab:sft} and Figure~\ref{fig:sft} summarise the run. Two features of
+the run matter later. The loss flattens well before the epoch ends --- the last
 thousand steps move it by under 0.02 --- so we stopped at 68\% of the schedule;
-continuing would have cost hours for noise. And on held-out data the drop is
+continuing would only have fit noise. And on held-out data the drop is
 almost entirely in the \emph{prompt} half (2.347 $\rightarrow$ 1.776 against
 1.063 $\rightarrow$ 0.970 for responses), which is what learning a template looks
 like: the model gets much better at predicting the instruction and response
@@ -187,19 +189,20 @@ The run takes 3{,}021 steps in 7h03m with a peak of 41.98\,GB, and
 Figure~\ref{fig:dpo} shows both curves. Loss falls from $\ln 2 = 0.693$ to 0.624
 with a minimum of 0.572. Held-out preference accuracy rises from 0.573 at step 0
 to 0.685 at step 2{,}500, then settles to 0.667 by the end, so we keep the
-best-validation checkpoint as the DPO model. The 41.98\,GB peak is worth noting
-because it is not a property of the configuration: it is reached at step 1{,}025,
-when the sampler first meets the longest pair in the data, and no amount of
-small-batch smoke testing predicts it.
+best-validation checkpoint as the DPO model. The 41.98\,GB peak is a property of
+the data order, not the configuration: it is reached at step 1{,}025,
+when the sampler first meets the longest pair, and
+small-batch smoke tests do not reveal it.
 
 \section{Capability Trade-offs}
 
 Both stages are evaluated on MMLU (285 dev items) and GSM8K (1{,}319 test items)
-under two prompting protocols, because the two model families trained here do not
-read the same prompts equally well. The base model is evaluated both ways: with
+under two prompting protocols, because the base model and the fine-tuned models
+do not read the same prompts equally well. The base model is evaluated both ways: with
 the zero-shot system prompt it was designed around, and with the same Alpaca-style
 instruction template the fine-tuned models were trained on --- the second is the
-controlled comparison, since it holds the prompt fixed across all four rows.
+controlled comparison, since it holds the prompt fixed across the other three
+rows. Figure~\ref{fig:capability} plots the same four rows.
 
 \begin{table}[t]
 \centering
@@ -254,8 +257,7 @@ the MMLU gain (0.628 $\rightarrow$ 0.561, back to the base model's level) and
 exceeds the base model on GSM8K (0.196 $\rightarrow$ 0.221). Its answer lengths
 move in the corresponding direction: 273 characters on MMLU and 324 on GSM8K,
 longer than the fine-tuned model on both. Whether this is a capability recovery or
-a length restoration is not separable from these numbers alone, and we do not
-claim the stronger reading.
+a length restoration is not separable from these numbers alone.
 
 \begin{figure}[t]
 \centering
@@ -264,10 +266,12 @@ claim the stronger reading.
 pair judged in both presentation orders. Left: raw winrate. Right: AlpacaEval's
 length-controlled winrate, computed by the benchmark's own estimator. Bars are
 individual judges; the length control narrows every gap without reordering any
-model. The locally served 8B judge is omitted from this figure --- it scores
-26--33\% where these three score 3.8--9.4\%, and one bar five times the height of
-the others would flatten precisely the comparison the figure exists to make. Its
-values are in Table~\ref{tab:judges}.}
+model. The length control narrows the gaps that involve the
+fine-tuned model, without reordering any model. The locally served 8B judge is
+omitted from this figure --- it scores 26--33\% where these three score
+3.8--9.4\%, and one bar five times the height of the others would flatten
+precisely the comparison the figure is for. Its values are in
+Table~\ref{tab:judges}.}
 \label{fig:alpaca}
 \end{figure}
 
@@ -275,10 +279,9 @@ values are in Table~\ref{tab:judges}.}
 
 AlpacaEval and SimpleSafetyTests are both scored by a language model judge, which
 makes the judge part of the measurement apparatus. We exploit that deliberately:
-the same predictions are scored by four judges spanning roughly two orders of
-magnitude of capability and three model families --- GPT-5.6-luna,
-DeepSeek-V4.1-Flash, Qwen3.8-Flash, and the very model we trained, served locally
-as an 8B judge. Every pair is judged twice, once in each presentation order, and
+the same predictions are scored by four judges: three frontier
+APIs --- GPT-5.6-luna, DeepSeek-V4.1-Flash, Qwen3.8-Flash --- and the SFT model
+itself, served locally as an 8B judge. Every pair is judged twice, once in each presentation order, and
 the two are averaged; AlpacaEval's own length-controlled winrate
 \citep{dubois2024length} is computed with the benchmark's estimator, which
 regresses the preference on the standardized length difference, a per-item
@@ -322,14 +325,14 @@ model & judge & raw & \lc{} & position bias & unparsed \\
 \caption{Each judge's winrate when our answer is presented first against when it
 is presented second, log--log. Points on the dashed line are position-unbiased.
 The three API judges sit on or near it; the locally served 8B --- squares ---
-wins 10--25 times more often from the first slot.}
+wins 9.7--24.6 times more often from the first slot.}
 \label{fig:position}
 \end{figure}
 
 \paragraph{The level is not robust.} The same three model outputs score 3.8\% to
-9.4\% under the API judges and 26\% to 33\% under the local 8B --- a spread of
-roughly $5\times$ driven entirely by who is doing the judging. The local judge is
-our own fine-tuned model evaluating answers in the style it was trained to
+9.4\% under the API judges and 26\% to 33\% under the local 8B (Figure~\ref{fig:alpaca}; Table~\ref{tab:judges}) --- every model
+scores 3.5--8$\times$ higher under the local judge. The local judge is
+the SFT model, evaluating answers in the style it was trained to
 produce, and it prefers them overwhelmingly; whether that is self-preference
 \citep{panickssery2024selfpref}, a systematically lower bar, or an artifact of its
 position bias (next paragraph) is not separable here, but the practical
@@ -347,14 +350,15 @@ that judge would be reporting the presentation order, not the model.
 \paragraph{The ordering survives --- across strong judges.} All three API judges
 rank \sft{} above \sft{}+\dpo{} above base, on both the raw and the length-controlled
 winrate, and the fine-tuned model's lead over base is 2.1 points under length
-control against 2.8 raw. The local 8B agrees on the endpoints but not the middle:
-under length control it puts base (25.90) \emph{above} \sft{} (22.29). So the
-ordering conclusion we would actually report --- instruction tuning helps, and the
+control against 2.8 raw. The local 8B keeps SFT on top under the raw winrate, but
+ranks \sft{}+\dpo{} last, below base, and under length control it puts
+base (25.90) \emph{above} \sft{} (22.29). The
+ordering we report --- instruction tuning helps, and the
 preference stage does not add open-ended quality --- is supported by three
 independent judges and contradicted on one pair by a fourth whose position bias
 alone is five times the effect being measured.
 
-\paragraph{Two of the gaps are inside the noise.} With 805 instructions, the
+\paragraph{One of the gaps is inside the noise.} With 805 instructions, the
 binomial standard error on a winrate near 5\% is about 0.8 points. The fine-tuned
 model's lead over base (2.8 raw, 2.1 \lc{}) is 2.6--3.5 standard errors and
 survives; the base and \sft{}+\dpo{} models are 0.2 points apart and are not
@@ -365,7 +369,7 @@ the defensible statement, not ``DPO is worse''.
 
 SimpleSafetyTests \citep{vidgen2024sst} is 100 prompts spanning five harm areas,
 each answered under the instruction template and judged safe or unsafe by the same
-four judges.
+four judges. Figure~\ref{fig:safety} reports the unsafe share by judge and model.
 
 \begin{figure}[t]
 \centering
@@ -381,39 +385,9 @@ The three API judges agree closely --- base 11--15\% unsafe, \sft{} 9--10\%,
 safety, with preference optimization giving most of it back. The effect is well
 inside the noise at $n=100$ (one item is one point). The local 8B judge calls
 every answer from every model safe, 100\% across the board; given that it also
-failed to discriminate between models on AlpacaEval and shows 10--25$\times$
+failed to discriminate between models on AlpacaEval and shows 9.7--24.6$\times$
 position bias, we read that as the judge's floor rather than as evidence about the
 models. A judge that never says ``unsafe'' cannot measure safety.
-
-\section{Discussion}
-
-\paragraph{What we would and would not claim.} Two of our results are robust: the
-format-versus-reasoning trade-off between the two training stages, which is a
-mechanism we can point at (answer length moves 27 $\rightarrow$ 88 $\rightarrow$
-273 characters and the scores move with it), and the ordering under judge-based
-evaluation, which three independent frontier judges agree on. Two are not: the
-safety numbers, where $n=100$ and the spread is a few items, and any absolute
-winrate, which is a joint property of the model and the judge.
-
-\paragraph{The judge is a hyperparameter.} The most transferable finding is the
-cheapest to act on. Switching judge moved our headline number by $5\times$;
-switching the \emph{presentation order} under a weak judge moved it by $25\times$.
-Neither is visible from the score alone. Two practices follow directly: judge both
-orders and average, and report the judge by name. A third is specific to this
-setting --- the model we trained is the worst available judge of the model we
-trained, which is worth stating because serving the fine-tuned model as its own
-evaluator is the natural thing to do when a GPU is already sitting there.
-
-\paragraph{Limitations.} The preference stage is one epoch of DPO at one
-$\beta$; we have not established that the capability trade-off we measure is
-intrinsic to DPO rather than a property of this learning rate and this data
-mixture. MMLU at 285 items resolves about 3 points, which is the size of several
-effects we discuss. Our judges are all proprietary models reached through an
-API, so the exact checkpoints behind the names are not under our control, and
-the AlpacaEval reference answers are GPT-4 Turbo's, which makes the whole
-comparison a comparison against that model's style as much as its quality. The
-safety evaluation judges 100 prompts, which is enough to detect a collapse and
-not enough to rank three models.
 
 \section{Related Work}
 
@@ -424,21 +398,56 @@ stages studied here; LoRA \citep{hu2021lora} makes both affordable on a single
 successor \citep{dubois2024length} supply the open-ended metric; the latter's
 estimator is what we call rather than a reimplementation. That LLM judges carry
 position bias and self-preference is known \citep{zheng2023mtbench,wang2023large,
-panickssery2024selfpref}; our contribution is not the existence of these biases
-but a direct measurement of how they scale with the judge's capability on one
-fixed set of outputs, and of what survives them.
+panickssery2024selfpref}; we measure how these biases scale with a judge's
+capability on one fixed set of outputs, and which conclusions survive them.
+
+\section{Discussion}
+
+\paragraph{What we would and would not claim.} Two of our results are robust: the
+format-versus-reasoning trade-off between the two training stages, which is a
+mechanism we can point at (MMLU answers move 353 $\rightarrow$ 27 $\rightarrow$
+273 characters while the score moves 0.558 $\rightarrow$ 0.628 $\rightarrow$
+0.561, and GSM8K answers move 797 $\rightarrow$ 88 $\rightarrow$ 324 with
+0.196 $\rightarrow$ 0.151 $\rightarrow$ 0.221), and the ordering under judge-based
+evaluation, which three independent frontier judges agree on. Two are not: the
+safety numbers, where $n=100$ and the spread is a few items, and any absolute
+winrate, which is a joint property of the model and the judge.
+
+\paragraph{The judge is a hyperparameter.} The most transferable finding is the
+cheapest to act on. Switching judge moved our headline number by up to $8\times$;
+switching the \emph{presentation order} under a weak judge moved it by $25\times$.
+Neither is visible from the score alone. Two practices follow directly: judge both
+orders and average, and report the judge by name. A third is specific to this
+setting: the SFT model is the worst available judge of its own outputs --- the
+obvious evaluator to reach for when a GPU is already in place, and the one to
+avoid.
+
+\section{Limitations}
+\label{sec:limitations}
+The preference stage is one epoch of DPO at one
+$\beta$; we have not established that the capability trade-off we measure is
+intrinsic to DPO rather than a property of this learning rate and this data
+mixture. MMLU at 285 items resolves about 3 points, which is the size of several
+effects we discuss. The three frontier judges are proprietary models reached through an
+API, so the exact checkpoints behind those names are not under our control, and
+the AlpacaEval reference answers are GPT-4 Turbo's, which makes the whole
+comparison a comparison against that model's style as much as its quality. The
+safety evaluation judges 100 prompts, which is enough to detect a collapse and
+not enough to rank three models.
 
 \section{Conclusion}
+
+
 
 A two-stage alignment pipeline at 8B scale buys format compliance and open-ended
 preference at the cost of reasoning, and the preference stage returns some
 reasoning at the cost of format. Measuring that required a judge, and measuring
-the judge turned out to be half the work: the same outputs score $5\times$
+the judge was as much the subject as measuring the models: the same outputs score
+up to $8\times$
 differently depending on who judges them, and a judge weak enough to be free is
 also weak enough to be 25 times more sensitive to presentation order than to the
-model. The model ordering we would report is stable across judges that are
-themselves stable --- which is a weaker guarantee than it sounds, and the reason
-we report the judge's name next to every number.
+model. The model ordering we report is stable across the three frontier judges;
+we therefore name the judge next to every number.
 
 \begin{thebibliography}{99}
 
