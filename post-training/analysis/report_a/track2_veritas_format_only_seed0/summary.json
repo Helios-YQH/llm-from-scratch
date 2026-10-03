@@ -1,0 +1,339 @@
+{
+  "n_steps": 80,
+  "last_step": 79,
+  "started_wall": "2026-10-02T07:06:50+00:00",
+  "ended_wall": "2026-10-02T08:01:46+00:00",
+  "wall_time_s": 3441.2940423488617,
+  "final": {
+    "n_sequences_kept": 24.0,
+    "val_unformatted": 0.00390625,
+    "reward_min": 0.0,
+    "val_correct_and_formatted": 0.0,
+    "val_reward_mean": 0.99609375,
+    "val_format_rate": 0.99609375,
+    "val_n": 1024,
+    "sampling_logprob_gap_max": 25.859037399291992,
+    "advantage_mean": -9.313225746154785e-10,
+    "reward_mean": 0.98828125,
+    "pass@1": 0.9375,
+    "pass@4": 1.0,
+    "val_accuracy": 0.0,
+    "time_train_s": 2.925842046737671,
+    "val_sampled_accuracy": 0.0,
+    "val_sampled_reward_mean": 0.97265625,
+    "val_sampled_correct_and_formatted": 0.0,
+    "train_response_len_mean": 98.98828125,
+    "val_sampled_unformatted": 0.02734375,
+    "response_clipped_ratio": 0.0,
+    "val_sampled_response_len_mean": 100.205078125,
+    "grad_norm": 0.265625,
+    "train_response_len_max": 236,
+    "val_formatted_only": 0.99609375,
+    "val_response_len_mean": 92.8876953125,
+    "val_sampled_n": 1024,
+    "val_sampled_format_rate": 0.97265625,
+    "val_sampled_formatted_only": 0.97265625,
+    "advantage_std": 0.28697121143341064,
+    "elapsed_s": 3441.2940423488617,
+    "reward_max": 1.0,
+    "time_generate_s": 24.181981801986694,
+    "pass@8": 1.0,
+    "format_reward_mean": 0.98828125,
+    "loss": -0.006197845563292503,
+    "pass@2": 1.0,
+    "answer_reward_mean": 0.0,
+    "train_accuracy": 0.0,
+    "time_grade_s": 0.009025812149047852,
+    "sampling_logprob_gap_mean": 0.1443660855293274,
+    "token_entropy": 0.7072151899337769
+  },
+  "per_metric": {
+    "advantage_mean": {
+      "first": -1.1175870895385742e-08,
+      "last": -9.313225746154785e-10,
+      "min": -1.1175870895385742e-08,
+      "max": 3.725290298461914e-09,
+      "max_step": 44
+    },
+    "advantage_std": {
+      "first": 0.6627317070960999,
+      "last": 0.28697121143341064,
+      "min": 0.0,
+      "max": 0.6627317070960999,
+      "max_step": 0
+    },
+    "answer_reward_mean": {
+      "first": 0.0,
+      "last": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "max_step": 0
+    },
+    "elapsed_s": {
+      "first": 145.40266966819763,
+      "last": 3441.2940423488617,
+      "min": 145.40266966819763,
+      "max": 3441.2940423488617,
+      "max_step": 79
+    },
+    "format_reward_mean": {
+      "first": 0.9140625,
+      "last": 0.98828125,
+      "min": 0.9140625,
+      "max": 1.0,
+      "max_step": 32
+    },
+    "grad_norm": {
+      "first": 0.5078125,
+      "last": 0.265625,
+      "min": 0.0,
+      "max": 0.5078125,
+      "max_step": 0
+    },
+    "loss": {
+      "first": -0.020233239978551865,
+      "last": -0.006197845563292503,
+      "min": -0.05463844910264015,
+      "max": 0.006859348621219397,
+      "max_step": 44
+    },
+    "n_sequences_kept": {
+      "first": 128.0,
+      "last": 24.0,
+      "min": 0.0,
+      "max": 128.0,
+      "max_step": 0
+    },
+    "pass@1": {
+      "first": 0.875,
+      "last": 0.9375,
+      "min": 0.875,
+      "max": 1.0,
+      "max_step": 3
+    },
+    "pass@2": {
+      "first": 0.96875,
+      "last": 1.0,
+      "min": 0.96875,
+      "max": 1.0,
+      "max_step": 1
+    },
+    "pass@4": {
+      "first": 1.0,
+      "last": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "max_step": 0
+    },
+    "pass@8": {
+      "first": 1.0,
+      "last": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "max_step": 0
+    },
+    "response_clipped_ratio": {
+      "first": 0.015625,
+      "last": 0.0,
+      "min": 0.0,
+      "max": 0.015625,
+      "max_step": 0
+    },
+    "reward_max": {
+      "first": 1.0,
+      "last": 1.0,
+      "min": 1.0,
+      "max": 1.0,
+      "max_step": 0
+    },
+    "reward_mean": {
+      "first": 0.9140625,
+      "last": 0.98828125,
+      "min": 0.9140625,
+      "max": 1.0,
+      "max_step": 32
+    },
+    "reward_min": {
+      "first": 0.0,
+      "last": 0.0,
+      "min": 0.0,
+      "max": 1.0,
+      "max_step": 32
+    },
+    "sampling_logprob_gap_max": {
+      "first": 19.397663116455078,
+      "last": 25.859037399291992,
+      "min": 15.667813301086426,
+      "max": 41.399051666259766,
+      "max_step": 13
+    },
+    "sampling_logprob_gap_mean": {
+      "first": 0.18428149819374084,
+      "last": 0.1443660855293274,
+      "min": 0.05861583352088928,
+      "max": 0.27200552821159363,
+      "max_step": 30
+    },
+    "time_generate_s": {
+      "first": 35.55318331718445,
+      "last": 24.181981801986694,
+      "min": 20.794692754745483,
+      "max": 35.55318331718445,
+      "max_step": 0
+    },
+    "time_grade_s": {
+      "first": 0.01279139518737793,
+      "last": 0.009025812149047852,
+      "min": 0.004244327545166016,
+      "max": 0.23851275444030762,
+      "max_step": 31
+    },
+    "time_train_s": {
+      "first": 17.401116371154785,
+      "last": 2.925842046737671,
+      "min": 0.08863449096679688,
+      "max": 17.401116371154785,
+      "max_step": 0
+    },
+    "token_entropy": {
+      "first": 0.8376892805099487,
+      "last": 0.7072151899337769,
+      "min": 0.0,
+      "max": 1.6145446300506592,
+      "max_step": 30
+    },
+    "train_accuracy": {
+      "first": 0.0,
+      "last": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "max_step": 0
+    },
+    "train_response_len_max": {
+      "first": 512,
+      "last": 236,
+      "min": 202,
+      "max": 512,
+      "max_step": 0
+    },
+    "train_response_len_mean": {
+      "first": 124.19921875,
+      "last": 98.98828125,
+      "min": 83.72265625,
+      "max": 124.19921875,
+      "max_step": 0
+    },
+    "val_accuracy": {
+      "first": 0.0,
+      "last": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "max_step": 0
+    },
+    "val_correct_and_formatted": {
+      "first": 0.0,
+      "last": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "max_step": 0
+    },
+    "val_format_rate": {
+      "first": 0.982421875,
+      "last": 0.99609375,
+      "min": 0.982421875,
+      "max": 0.99609375,
+      "max_step": 50
+    },
+    "val_formatted_only": {
+      "first": 0.982421875,
+      "last": 0.99609375,
+      "min": 0.982421875,
+      "max": 0.99609375,
+      "max_step": 50
+    },
+    "val_n": {
+      "first": 1024,
+      "last": 1024,
+      "min": 1024,
+      "max": 1024,
+      "max_step": 0
+    },
+    "val_response_len_mean": {
+      "first": 98.35546875,
+      "last": 92.8876953125,
+      "min": 91.783203125,
+      "max": 98.35546875,
+      "max_step": 0
+    },
+    "val_reward_mean": {
+      "first": 0.982421875,
+      "last": 0.99609375,
+      "min": 0.982421875,
+      "max": 0.99609375,
+      "max_step": 50
+    },
+    "val_sampled_accuracy": {
+      "first": 0.0,
+      "last": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "max_step": 0
+    },
+    "val_sampled_correct_and_formatted": {
+      "first": 0.0,
+      "last": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "max_step": 0
+    },
+    "val_sampled_format_rate": {
+      "first": 0.953125,
+      "last": 0.97265625,
+      "min": 0.953125,
+      "max": 0.9775390625,
+      "max_step": 70
+    },
+    "val_sampled_formatted_only": {
+      "first": 0.953125,
+      "last": 0.97265625,
+      "min": 0.953125,
+      "max": 0.9775390625,
+      "max_step": 70
+    },
+    "val_sampled_n": {
+      "first": 1024,
+      "last": 1024,
+      "min": 1024,
+      "max": 1024,
+      "max_step": 0
+    },
+    "val_sampled_response_len_mean": {
+      "first": 106.8828125,
+      "last": 100.205078125,
+      "min": 94.5546875,
+      "max": 106.8828125,
+      "max_step": 0
+    },
+    "val_sampled_reward_mean": {
+      "first": 0.953125,
+      "last": 0.97265625,
+      "min": 0.953125,
+      "max": 0.9775390625,
+      "max_step": 70
+    },
+    "val_sampled_unformatted": {
+      "first": 0.046875,
+      "last": 0.02734375,
+      "min": 0.0224609375,
+      "max": 0.046875,
+      "max_step": 0
+    },
+    "val_unformatted": {
+      "first": 0.017578125,
+      "last": 0.00390625,
+      "min": 0.00390625,
+      "max": 0.017578125,
+      "max_step": 0
+    }
+  }
+}

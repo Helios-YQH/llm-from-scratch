@@ -1,0 +1,12 @@
+{
+  "r1_zero_three_shot_gsm8k": {
+    "n": 1319,
+    "accuracy": 0.26004548900682334,
+    "format_rate": 0.9734647460197119,
+    "correct_and_formatted": 0.26004548900682334,
+    "formatted_only": 0.7134192570128886,
+    "unformatted": 0.026535253980288095,
+    "reward_mean": 0.26004548900682334,
+    "response_len_mean": 100.24109173616377
+  }
+}

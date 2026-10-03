@@ -1,0 +1,32 @@
+{
+  "question_only": {
+    "n": 1319,
+    "accuracy": 0.002274450341167551,
+    "format_rate": 0.17437452615617893,
+    "correct_and_formatted": 0.002274450341167551,
+    "formatted_only": 0.17210007581501138,
+    "unformatted": 0.8256254738438211,
+    "reward_mean": 0.002274450341167551,
+    "response_len_mean": 272.7202426080364
+  },
+  "r1_zero": {
+    "n": 1319,
+    "accuracy": 0.000758150113722517,
+    "format_rate": 0.6254738438210766,
+    "correct_and_formatted": 0.000758150113722517,
+    "formatted_only": 0.624715693707354,
+    "unformatted": 0.37452615617892343,
+    "reward_mean": 0.000758150113722517,
+    "response_len_mean": 96.56937073540561
+  },
+  "r1_zero_three_shot_gsm8k": {
+    "n": 1319,
+    "accuracy": 0.18271417740712662,
+    "format_rate": 0.9416224412433661,
+    "correct_and_formatted": 0.18271417740712662,
+    "formatted_only": 0.7589082638362395,
+    "unformatted": 0.058377558756633814,
+    "reward_mean": 0.18271417740712662,
+    "response_len_mean": 108.47763457164518
+  }
+}
