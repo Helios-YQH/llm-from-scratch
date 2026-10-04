@@ -218,7 +218,7 @@ Two mechanisms point the same way.
 \end{equation}
 so the expected reward is an affine function of the true one, and $\nabla_\theta\,\mathbb{E}[\tilde r] = (1-2\epsilon)\nabla_\theta\,\eta$: the noise scales the gradient and shifts the reward level, and it does not move the optimum. Now note what GRPO does with a reward vector: the advantage is $A_i = (r_i - \bar r)/\hat\sigma$, which is invariant to $r \mapsto ar + b$ for any $a>0$. The $+\epsilon$ shift cancels in the numerator and the $(1-2\epsilon)$ scale cancels in both numerator and denominator. Adam compounds this: its update is invariant to a global rescaling of the gradient as well (the first and second moments scale together). So the first-order effect of the closed form is neutralized \emph{exactly} by the estimator's normalization: what remains is the per-sample variance the flips inject, which is second order. The 10\%-flip arm is consistent with this: it does not lose the 20\% the closed form suggests, because the closed form is about the expected gradient, and the estimator normalizes exactly that away.
 
-The second mechanism also makes a prediction, which is why the 30\%-flip arm was run: if the residual cost is the injected variance rather than the scaling, then it should grow faster than $(1-2\epsilon)$ once the flip rate is high enough for variance to dominate: an arm at $\epsilon=0.3$ should retain markedly less than the 91--106\% of the 10\% arm. The matched-step validation comparison in Section~\ref{sec:v2} is the evidence available on this: about 72\% retained across the two 30\%-flip seeds, against 99\% at $\epsilon=0.1$ on that split. The direction matches the prediction; the test-set version of the comparison was not completed.
+The second mechanism also makes a prediction, which is why the 30\%-flip arm was run: if the residual cost is the injected variance rather than the scaling, then it should grow faster than $(1-2\epsilon)$ once the flip rate is high enough for variance to dominate: an arm at $\epsilon=0.3$ should retain markedly less than the 91--106\% of the 10\% arm. The matched-step validation comparison in Section~\ref{sec:v2} is the evidence available on this: about 72\% retained across the two 30\%-flip seeds, against 99\% at $\epsilon=0.1$ on that split. The direction matches the prediction.
 
 \paragraph{Caveats on this axis.} (i) The exact arm has a single seed, so the denominators in Figure~\ref{fig:asymmetry}'s RL numbers carry no seed variance; what is robust is that neither flip-arm seed falls far from the exact arm (0.91 and 1.06 of its gain). (ii) The selection curve and the RL points are computed on different sets (512 questions with 32 samples vs.\ 1{,}319 questions with 1 sample), so their absolute levels should not be compared, only their retained fractions. (iii) The verifier here is a program with a controlled failure mode, not a learned reward model; the numbers are properties of this protocol, and the claim we take from them is the ordering between the two uses. (iv) Format-only degrades the two uses differently but both severely, so the $\epsilon=0.1$ result is the sensitive one and it is a single noise level; the 30\% arm is the test.
 
@@ -320,6 +320,8 @@ Chujie Zheng, Shixuan Liu, Mingze Li, et al.
 
 \end{thebibliography}
 
+\clearpage
+
 \appendix
 
 \section{Reproduction details}
@@ -329,46 +331,53 @@ Chujie Zheng, Shixuan Liu, Mingze Li, et al.
 \label{app:prompts}
 
 All three prompts are used verbatim; the listings wrap the long lines for
-display. The zero-shot and 3-shot prompts share the same preamble, and the
-3-shot variant prepends three worked GSM8K examples before the question.
+display, and the templates store the preamble as a single line. The zero-shot
+and 3-shot prompts share the same preamble, and the 3-shot variant prepends
+three worked GSM8K examples before the question.
 
-\textbf{Zero-shot (\texttt{r1\_zero}).}
+\textbf{Zero-shot (\texttt{r1\_zero}).}\nobreak
+{\small
 \begin{verbatim}
-A conversation between User and Assistant. The User asks a question, and the
-Assistant solves it. The Assistant first thinks about the reasoning process in
-the mind and then provides the User with the answer. The reasoning process is
-enclosed within <think> </think> and answer is enclosed within <answer> </answer>
-tags, respectively, i.e., <think> reasoning process here </think> <answer>
-answer here </answer>.
+A conversation between User and Assistant. The User asks a question, and
+the Assistant solves it. The Assistant first thinks about the reasoning
+process in the mind and then provides the User with the answer. The
+reasoning process is enclosed within <think> </think> and answer is
+enclosed within <answer> </answer> tags, respectively, i.e., <think>
+reasoning process here </think> <answer> answer here </answer>.
 User: {question}
 Assistant: <think>
 \end{verbatim}
+}
 
-\textbf{3-shot (\texttt{r1\_zero\_three\_shot\_gsm8k}).}
+\textbf{3-shot (\texttt{r1\_zero\_three\_shot\_gsm8k}).}\nobreak
+{\small
 \begin{verbatim}
-User: There are 15 trees in the grove. Grove workers will plant trees in the
-grove today. After they are done, there will be 21 trees. How many trees did
-the grove workers plant today?
+User: There are 15 trees in the grove. Grove workers will plant trees in
+the grove today. After they are done, there will be 21 trees. How many
+trees did the grove workers plant today?
 Assistant: <think> There are 15 trees originally. Then there were 21 trees
 after some more were planted. So there must have been 21 - 15 = 6. So the
 answer is 6. </think> <answer> 6 </answer>
-User: If there are 3 cars in the parking lot and 2 more cars arrive, how many
-cars are in the parking lot?
-Assistant: <think> There are originally 3 cars. 2 more cars arrive. 3 + 2 = 5.
-So the answer is 5. </think> <answer> 5 </answer>
-User: Leah had 32 chocolates and her sister had 42. If they ate 35, how many
-pieces do they have left in total?
-Assistant: <think> Originally, Leah had 32 chocolates. Her sister had 42. So
-in total they had 32 + 42 = 74. After eating 35, they had 74 - 35 = 39. So the
-answer is 39. </think> <answer> 39 </answer>
+User: If there are 3 cars in the parking lot and 2 more cars arrive, how
+many cars are in the parking lot?
+Assistant: <think> There are originally 3 cars. 2 more cars arrive. 3 + 2 =
+5. So the answer is 5. </think> <answer> 5 </answer>
+User: Leah had 32 chocolates and her sister had 42. If they ate 35, how
+many pieces do they have left in total?
+Assistant: <think> Originally, Leah had 32 chocolates. Her sister had 42.
+So in total they had 32 + 42 = 74. After eating 35, they had 74 - 35 = 39.
+So the answer is 39. </think> <answer> 39 </answer>
 User: {question}
 Assistant: <think>
 \end{verbatim}
+}
 
-\textbf{Question-only.}
+\textbf{Question-only.}\nobreak
+{\small
 \begin{verbatim}
 {question} Please put your final answer within \boxed{}.
 \end{verbatim}
+}
 
 \subsection{Hyperparameters}
 \label{app:hp}
@@ -376,11 +385,11 @@ Assistant: <think>
 Every run shares the settings in Table~\ref{tab:hp}; the variants change only
 the knobs listed in Table~\ref{tab:hpvar}.
 
-\begin{table}[t]
-\caption{Shared training settings.}
-\label{tab:hp}
-\centering
+\begin{minipage}{\linewidth}
 \small
+\centering
+\captionof{table}{Shared training settings.}
+\label{tab:hp}
 \begin{tabular}{@{}ll@{}}
 \toprule
 Setting & Value \\
@@ -395,13 +404,13 @@ Sampling & temperature 1.0, up to 512 new tokens \\
 Evaluation & greedy and sampled (1.0) every 10 steps \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{minipage}
 
-\begin{table}[t]
-\caption{Per-variant overrides (all other settings unchanged).}
-\label{tab:hpvar}
-\centering
+\begin{minipage}{\linewidth}
 \small
+\centering
+\captionof{table}{Per-variant overrides (all other settings unchanged).}
+\label{tab:hpvar}
 \begin{tabular}{@{}lp{0.60\linewidth}@{}}
 \toprule
 Variant & Overrides \\
@@ -417,7 +426,7 @@ Variant & Overrides \\
 degraded-verifier arms & training reward replaced by the degraded verifier (Appendix~\ref{app:verifiers}) \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{minipage}
 
 \subsection{Degraded verifiers}
 \label{app:verifiers}
